@@ -157,7 +157,7 @@
     if ([segue.identifier isEqualToString:@"AddFriendSegue"])
     {
         UINavigationController* navigationController = segue.destinationViewController;
-        HBAddFriendViewController* addFriendViewController = [navigationController viewControllers][0];
+        HBAddFriendViewController* addFriendViewController = navigationController.viewControllers[0];
         addFriendViewController.delegate = self;
     }
 }

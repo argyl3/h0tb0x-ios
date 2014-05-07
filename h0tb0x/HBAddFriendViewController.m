@@ -15,6 +15,8 @@
 
 @implementation HBAddFriendViewController
 
+BOOL canceled;  // iOS storyboard perversions require such nonsense
+
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
@@ -34,12 +36,14 @@
 
 - (void) viewWillAppear:(BOOL)animated
 {
+    canceled = NO;
     [self.friendNameTextField becomeFirstResponder];
 }
 
 
 - (IBAction)cancel:(id)sender
 {
+    canceled = YES;
     [self.delegate addFriendViewControllerDidCancel: self];
 }
 
@@ -76,12 +80,24 @@
 
 #pragma mark - Navigation
 
+- (BOOL)shouldPerformSegueWithIdentifier:(NSString *)identifier sender:(id)sender
+{
+    if ([identifier isEqualToString:@"AcquireFingerprintSegue"] && canceled)
+    {
+        canceled = NO;
+        return NO;
+    }
+    
+    return YES;
+}
+
 - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender
 {
+    NSLog(@"segue.identifier is %@", segue.identifier);
     if ([segue.identifier isEqualToString:@"AcquireFingerprintSegue"])
     {
         UINavigationController* navigationController = segue.destinationViewController;
-        HBAcquireFingerprintViewController* acquireFingerprintViewController = [navigationController viewControllers][0];
+        HBAcquireFingerprintViewController* acquireFingerprintViewController = navigationController.viewControllers[0];
         acquireFingerprintViewController.delegate = self;
         acquireFingerprintViewController.friendName = self.friendNameTextField.text;
     }
